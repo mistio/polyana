@@ -1,0 +1,94 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+
+<dom-module id="app-polyanna">
+    <template>
+      <style>
+        :host{
+          text-align: center;
+          color: #000000;
+        }
+       #panel1{
+           width: 150px;
+           margin-left: 68px;
+           float: left;
+           font-weight: bold;
+       }
+       #panel2{
+           display: block;
+           margin-right: 68px;
+           float: right;
+           font-weight: bold;
+       }
+      </style>
+      <h2 id="show">Hello!1!</h2>
+        <div id="panel1">here</div>
+        <div id="panel2">here</div><br>
+        <br></br>
+        <chart-bar>hello</chart-bar>
+        <script src="https://gist.github.com/anatolijd/73b1360c9780c0d161b1.js"></script>
+        <br></br>
+        <template is="dom-repeat" items="[[rows]]"> //??
+          <row-element height="[[rowheight()]]" ></row-element>
+        </template>
+      <iron-ajax
+        auto
+        url="http://localhost:3000/api/dashboards/db"
+        headers='{"Authorization": "Bearer eyJrIjoiTDdKaHdKNjJFT05nWU81dHlnYVVkbGdiUmVIY1lYUWkiLCJuIjoibXlrZXkiLCJpZCI6Mn0="}'
+        handle-as="json"
+        content-type="application/json"
+        method="POST"
+        on-response="_handleResponse"
+        debounce-duration="300"
+        body=
+    {
+      "dashboard": {
+        "id": null,
+        "title": "Production Overview",
+        "tags": [ "templated" ],
+        "timezone": "browser",
+        "rows": [
+          {
+          }
+        ]
+        "schemaVersion": 6,
+        "version": 0
+      },
+      "overwrite": false
+    }></iron-ajax>
+
+    </template>
+    <script>
+
+        Polymer({
+          is: 'app-polyanna',
+
+          properties: {
+            response: Object,
+
+            // rows:
+          },
+          _handleResponse:function(data){
+            console.log(request.detail.response);
+            console.log(this.$.ajax.lastResponse);
+            console.log(this.$.ajax.params);
+            this.$.show.textContent = data.detail.response;
+            this.response = data.detail.response;
+            this._fillrow1();
+          },
+          _fillrow1: function(){
+            var node = this.response.dashboard.rows[1].panels[0].title;
+            this.$.panel1.innerHTML= node;
+            var node2 = this.response.dashboard.rows[1].panels[1].title;
+            this.$.panel2.innerHTML= node2;
+            //alert(1);
+
+          },
+          rowheight: function(){
+
+          }
+      });
+
+    </script>
+</dom-module>
