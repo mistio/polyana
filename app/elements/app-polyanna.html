@@ -25,6 +25,7 @@
       <h2 id="show">Hello!1!</h2>
         <div id="panel1">here</div>
         <div id="panel2">here</div><br>
+        test
         <br></br>
         <iframe src="http://localhost:3000/dashboard-solo/db/mydashboard?panelId=4&fullscreen&from=1455559611280&to=1456243760954" width="1250" height="900" align="center" frameborder="0"></iframe> -->
 
@@ -32,7 +33,7 @@
         <script src="https://gist.github.com/anatolijd/73b1360c9780c0d161b1.js"></script>
         <br></br>
         <template is="dom-repeat" items="[[rows]]">
-          <row-element height="[[rowheight()]]" ></row-element>
+          <row-element height="[[rowheight(item)]]" ></row-element>
         </template>
       <iron-ajax
       auto
@@ -52,7 +53,7 @@
 
           properties: {
             response: Object,
-            rows: Number
+            rows: Array
 
             // rows:
           },
@@ -60,7 +61,9 @@
             this.$.show.textContent = data.detail.response;
             this.response = data.detail.response;
             this._fillrow1();
-            this.makeRows(data);
+            
+            this.makeRows();
+
           },
           _fillrow1: function(){
             var node = this.response.dashboard.rows[1].panels[0].title;
@@ -68,14 +71,18 @@
             var node2 = this.response.dashboard.rows[1].panels[1].title;
             this.$.panel2.innerHTML= node2;
             //alert(1);
-
           },
-          rowheight: function(){
-
+          rowheight: function(row){
+            return this.row.height;
           },
-          makeRows: function() {
-            var rowsnumber = this.response.dashboard.rows.length;
-            this.rows = rowsnumber;
+          makeRows: function() {            
+            this.rows = this.response.dashboard.rows;
+          }
+          ,
+          translateResponse: function() {
+            for (var prop in this.responce) {
+
+            }
           }
 
       });

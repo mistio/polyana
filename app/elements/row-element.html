@@ -16,7 +16,7 @@
           background-color: #f5f5f5
         }
       </style>
-      <!--<div style="[[height]]"></div>-->
+      <div style="[[rowheight]]"></div>
     </template>
     <script>
       Polymer({
@@ -26,8 +26,8 @@
           height: String,
           // colors:/
         },
-        _nameyourfunction:function(){
-
+        rowheight:function(){
+          return 'height:'+this.height+";";
         },
 
       });
