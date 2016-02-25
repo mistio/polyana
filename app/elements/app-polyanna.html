@@ -23,17 +23,18 @@
        }
       </style>
       <h2 id="show">Hello!1!</h2>
-        <div id="panel1">here</div>
-        <div id="panel2">here</div><br>
-        <br></br>
-        <iframe src="http://localhost:3000/dashboard-solo/db/mydashboard?panelId=4&fullscreen&from=1455559611280&to=1456243760954" width="1250" height="900" align="center" frameborder="0"></iframe> -->
-
+        <br>
+        <!--<div id="panel1">here</div>
+        <div id="panel2">here</div>
+        <br></br>-->
+        <!--<iframe src="http://localhost:3000/dashboard-solo/db/mydashboard?panelId=4&fullscreen&from=1455559611280&to=1456243760954" width="1250" height="900" align="center" frameborder="0"></iframe> -->
         <chart-bar>hello</chart-bar>
         <script src="https://gist.github.com/anatolijd/73b1360c9780c0d161b1.js"></script>
         <br></br>
-        <template is="dom-repeat" items="[[rows]]">
-          <row-element height="[[rowheight()]]" ></row-element>
-        </template>
+        <template is="dom-repeat" items="[[rows]]" items="[[panels]]">
+          <row-element height="[[rowheight(index)]]" title="[[_fillrow1(index)]]"></row-element>
+          <p>{{item.title}}</p>
+         </template>
       <iron-ajax
       auto
       url="http://localhost:5000/api/dashboards/home"
@@ -52,32 +53,37 @@
 
           properties: {
             response: Object,
-            rows: Number
+            rows: {type:Array, value: []},
+            panels:{type:Array, value:[]}
 
             // rows:
           },
           _handleResponse:function(data){
             this.$.show.textContent = data.detail.response;
             this.response = data.detail.response;
-            this._fillrow1();
-            this.makeRows(data);
+            /*this._fillrow1();*/
+            this.makeRows();
+            this.makePanels();
           },
-          _fillrow1: function(){
-            var node = this.response.dashboard.rows[1].panels[0].title;
-            this.$.panel1.innerHTML= node;
-            var node2 = this.response.dashboard.rows[1].panels[1].title;
-            this.$.panel2.innerHTML= node2;
+          _fillrow1: function(index){
+            var node = this.response.dashboard.rows[index].panels[0].title;
+            this.title= node;
+            return  node;
             //alert(1);
-
           },
-          rowheight: function(){
-
+          rowheight: function(index){
+            return this.rows[index].height;
           },
           makeRows: function() {
-            var rowsnumber = this.response.dashboard.rows.length;
-            this.rows = rowsnumber;
+            this.rows = this.response.dashboard.rows;
+          },
+          makePanels:function(){
+            this.panels=this.response.dashboard.rows.panels;
+          },
+          translateResponse: function() {
+            for (var prop in this.responce) {
+            }
           }
-
       });
 
     </script>
