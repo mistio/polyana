@@ -35,7 +35,8 @@
           id: Number,
           type: String,
           url: {type:String, value: "", computed: "_computeUrl(id)"},
-          target:{type:Array, computed:"getTarget()"}
+          target:{type:Array, computed:"getTarget()"},
+          datapoints:{type:Array, computed: "getDatapoints()"}
           // colors:/
         },
         showGraph(){
@@ -56,6 +57,10 @@
        getTarget: function(){
          var targets= this.panel.target;
          return targets;
+       },
+       getDatapoints: function(){
+         var datapoints=this.panel.datapoints;
+         return datapoints;
        }
       });
     </script>

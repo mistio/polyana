@@ -35,11 +35,8 @@
           panels:{type:Array, computed:'getPanels(row)'}
           // colors:/
         },
-        rowheight:function(){
+        rowheight:function(height){
           return "height:"+this.height;
-        },
-        rowColors:function(){
-          return "threshold1Color:"+this.threshold1Color;
         },
         _fillrow1:function(){
           return "title"+this.title;

@@ -29,12 +29,17 @@
         <br></br>-->
         <!--<iframe src="http://localhost:3000/dashboard-solo/db/mydashboard?panelId=4&fullscreen&from=1455559611280&to=1456243760954" width="1250" height="900" align="center" frameborder="0"></iframe> -->
         <!-- <chart-bar>hello</chart-bar> -->
-        <script src="https://gist.github.com/anatolijd/73b1360c9780c0d161b1.js"></script>
         <br></br>
         <template is="dom-repeat" items="[[rows]]">
           <row-element height="[[rowheight(index)]]" title="[[_fillrow1(index)]]" row="[[thisRow(index)]]"></row-element>
           <p>{{item.title}}</p>
          </template>
+        <br></br>
+        <!--<chart-bar>hello</chart-bar>-->
+        <br></br>
+        <template is="dom-repeat" items="[[rows]]">
+          <row-element height="[[rowheight(item)]]" ></row-element>
+        </template>
       <iron-ajax
       auto
       url="http://localhost:5000/api/dashboards/home"
@@ -63,7 +68,7 @@
             this.makeRows();
           },
           _fillrow1: function(index){
-            var node = this.response.dashboard.rows[index].panels[index].title;
+            var node = this.response.dashboard.rows[index].panels.title;
             this.title= node;
             return  node;
             //alert(1);
@@ -76,11 +81,12 @@
           },
           thisRow: function(index){
             return this.response.dashboard.rows[index]
-          }
-          /*translateResponse: function() {
+          },
+          translateResponse: function() {
             for (var prop in this.responce) {
+
             }
-          }*/
+          }
       });
 
     </script>
