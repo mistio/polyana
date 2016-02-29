@@ -1,0 +1,62 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<dom-module id="panels-element">
+    <template>
+      <style>
+        :host{
+          border-collapse: collapse;
+          border: 1px solid black;
+          width: 100%;
+          text-align: center;
+          padding: 15px;
+          display: block;
+        }
+      </style>
+      <p>[[panel.title]]</p>
+      <template is="dom-if" if ="[[isGraph]]">
+        is Graph
+        <iron-ajax
+        auto
+        url="_computeUrl"
+        headers='{"Authorization": "Bearer eyJrIjoiTDdKaHdKNjJFT05nWU81dHlnYVVkbGdiUmVIY1lYUWkiLCJuIjoibXlrZXkiLCJpZCI6Mn0="}'
+        handle-as="json"
+        method="GET"
+        debounce-duration="300"></iron-ajax>
+      </template>
+    </template>
+    <script>
+      Polymer({
+        is: 'panels-element',
+
+        properties: {
+          panel: Object,
+          title: String,
+          id: Number,
+          type: String,
+          url: {type:String, value: "", computed: "_computeUrl(id)"},
+          target:{type:Array, computed:"getTarget()"}
+          // colors:/
+        },
+        showGraph(){
+
+        },
+        _computeUrl: function(id) {
+         return 'http://localhost:3000/api/datasources/proxy/'+ id +'/render?format=json&target=ubuntu.cpu-total.cpu.*&from=-300secs';
+       },
+       isGraph: function(){
+         if (this.panel.type == "graph") {
+           return true;
+         }
+         else {
+           return false;
+         }
+         //return (this.panel.type == "graph" ? true : false)
+       },
+       getTarget: function(){
+         var targets= this.panel.target;
+         return targets;
+       }
+      });
+    </script>
+</dom-module>

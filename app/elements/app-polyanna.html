@@ -28,11 +28,11 @@
         <div id="panel2">here</div>
         <br></br>-->
         <!--<iframe src="http://localhost:3000/dashboard-solo/db/mydashboard?panelId=4&fullscreen&from=1455559611280&to=1456243760954" width="1250" height="900" align="center" frameborder="0"></iframe> -->
-        <chart-bar>hello</chart-bar>
+        <!-- <chart-bar>hello</chart-bar> -->
         <script src="https://gist.github.com/anatolijd/73b1360c9780c0d161b1.js"></script>
         <br></br>
-        <template is="dom-repeat" items="[[rows]]" items="[[panels]]">
-          <row-element height="[[rowheight(index)]]" title="[[_fillrow1(index)]]"></row-element>
+        <template is="dom-repeat" items="[[rows]]">
+          <row-element height="[[rowheight(index)]]" title="[[_fillrow1(index)]]" row="[[thisRow(index)]]"></row-element>
           <p>{{item.title}}</p>
          </template>
       <iron-ajax
@@ -54,8 +54,6 @@
           properties: {
             response: Object,
             rows: {type:Array, value: []},
-            panels:{type:Array, value:[]}
-
             // rows:
           },
           _handleResponse:function(data){
@@ -63,10 +61,9 @@
             this.response = data.detail.response;
             /*this._fillrow1();*/
             this.makeRows();
-            this.makePanels();
           },
           _fillrow1: function(index){
-            var node = this.response.dashboard.rows[index].panels[0].title;
+            var node = this.response.dashboard.rows[index].panels[index].title;
             this.title= node;
             return  node;
             //alert(1);
@@ -77,13 +74,13 @@
           makeRows: function() {
             this.rows = this.response.dashboard.rows;
           },
-          makePanels:function(){
-            this.panels=this.response.dashboard.rows.panels;
-          },
-          translateResponse: function() {
+          thisRow: function(index){
+            return this.response.dashboard.rows[index]
+          }
+          /*translateResponse: function() {
             for (var prop in this.responce) {
             }
-          }
+          }*/
       });
 
     </script>

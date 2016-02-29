@@ -16,7 +16,11 @@
           background-color: #f5f5f5;
         }
       </style>
-      <div style$="[[computedHeight]]"><p>{{showTitle}}</p></div>
+      <div style$="[[computedHeight]]">
+        <template is="dom-repeat" items="[[panels]]">
+          <panels-element panel="[[thisPanel(index)]]">hello</panels-element>
+        </template>
+      </div>
     </template>
     <script>
       Polymer({
@@ -26,14 +30,25 @@
           title:String,
           height: String,
           computedHeight: {type:String, computed:'rowheight(height)'},
-          showTitle: {type:String, computed:'_fillrow1(title)'}
+          showTitle: {type:String, computed:'_fillrow1(title)'},
+          row:{type:Object},
+          panels:{type:Array, computed:'getPanels(row)'}
           // colors:/
         },
         rowheight:function(){
           return "height:"+this.height;
         },
+        rowColors:function(){
+          return "threshold1Color:"+this.threshold1Color;
+        },
         _fillrow1:function(){
           return "title"+this.title;
+        },
+        thisPanel:function(index){
+          return this.row.panels[index];
+        },
+        getPanels:function(row){
+           return row.panels;
         }
 
       });
