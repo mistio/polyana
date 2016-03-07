@@ -10,7 +10,7 @@
           width: 100%;
           text-align: center;
           padding: 15px;
-          display: block;
+          display: inline-block;
         }
         :hover {
           background-color: #f5f5f5;
@@ -18,7 +18,7 @@
       </style>
       <div style$="[[computedHeight]]">
         <template is="dom-repeat" items="[[panels]]">
-          <panels-element panel="[[thisPanel(index)]]">hello</panels-element>
+          <panels-element panel="[[thisPanel(index)]]" datasources="[[datasources]]"></panels-element>
         </template>
       </div>
     </template>
@@ -30,13 +30,19 @@
           title:String,
           height: String,
           computedHeight: {type:String, computed:'rowheight(height)'},
+          datasources: Array,
           showTitle: {type:String, computed:'_fillrow1(title)'},
           row:{type:Object},
           panels:{type:Array, computed:'getPanels(row)'}
-          // colors:/
+        },
+        _getDatasourceId:function(index){
+          var name = this.row.panels[index].datasource;
+          return '2';
         },
         rowheight:function(height){
-          return "height:"+this.height;
+          if(height){
+            return "height:"+this.height;
+          }
         },
         _fillrow1:function(){
           return "title"+this.title;
@@ -46,7 +52,7 @@
         },
         getPanels:function(row){
            return row.panels;
-        }
+        },
 
       });
     </script>

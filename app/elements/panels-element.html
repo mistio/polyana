@@ -4,26 +4,40 @@
 <dom-module id="panels-element">
     <template>
       <style>
-        :host{
-          border-collapse: collapse;
-          border: 1px solid black;
-          width: 100%;
-          text-align: center;
-          padding: 15px;
+        google-chart {
+          height: 300px;
+          width: 400px;
           display: block;
         }
+
       </style>
-      <p>[[panel.title]]</p>
-      <template is="dom-if" if ="[[isGraph]]">
-        is Graph
-        <iron-ajax
+
+      <div>[[panel.title]]</div>
+      <div style="display: none;">[[datasourceid]]</div>
+      <template is="dom-if" if="[[isGraph]]">
+        <iron-ajax id="ajax"
         auto
-        url="_computeUrl"
+        url="[[_computeUrl()]]"
         headers='{"Authorization": "Bearer eyJrIjoiTDdKaHdKNjJFT05nWU81dHlnYVVkbGdiUmVIY1lYUWkiLCJuIjoibXlrZXkiLCJpZCI6Mn0="}'
         handle-as="json"
         method="GET"
+        on-response="_handlePanelRequest"
         debounce-duration="300"></iron-ajax>
+
+        <template is="dom-repeat" items="[[graphs]]" >
+          <google-chart
+            id='line_chart'
+            type='line'
+            options='{"title":""}'
+            cols='[{"label": "Month", "type": "string"},{"label": "Days", "type": "number"}]'
+            rows='[[_reverseDatapoints(item)]]'>
+            //cols='[[getTime()]]'
+          </google-chart>
+          <p>[[item.target]]</p>
+        </template>
+
       </template>
+
     </template>
     <script>
       Polymer({
@@ -34,33 +48,75 @@
           title: String,
           id: Number,
           type: String,
-          url: {type:String, value: "", computed: "_computeUrl(id)"},
-          target:{type:Array, computed:"getTarget()"},
-          datapoints:{type:Array, computed: "getDatapoints()"}
-          // colors:/
+          datasource: String,
+          datasources: Array,
+          graphs:Array,
+          datasourceid: {type:String, computed:"_datasourceid(datasources,panel)"},
+          targets:{type:Array, computed:"getTarget(panel)"},
+          datapoints:{type:Array, computed: "getDatapoints(panel)"},
+          isGraph:{type:Boolean, computed:"_isGraph(panel)"},
+          time:{type:Array,computed:"getTime(panel)"}
         },
-        showGraph(){
 
+        _handlePanelRequest(data){
+          console.log("hi", data.detail.response);
+          this.graphs=data.detail.response;
         },
-        _computeUrl: function(id) {
-         return 'http://localhost:3000/api/datasources/proxy/'+ id +'/render?format=json&target=ubuntu.cpu-total.cpu.*&from=-300secs';
+        _computeUrl: function() {
+          console.log('computes url ' +this.datasourceid);
+         return 'http://localhost:5000/api/datasources/proxy/'+this.datasourceid+'/render?format=json&target=ubuntu.cpu-total.cpu.*&from=-300secs';
        },
-       isGraph: function(){
-         if (this.panel.type == "graph") {
+       _isGraph: function(panel){
+         if (panel.type == "graph") {
            return true;
          }
          else {
            return false;
          }
-         //return (this.panel.type == "graph" ? true : false)
        },
-       getTarget: function(){
-         var targets= this.panel.target;
-         return targets;
+       getTime: function(panel){
+         return this.panel.time;
        },
-       getDatapoints: function(){
-         var datapoints=this.panel.datapoints;
-         return datapoints;
+       getTarget: function(panel){
+         return this.panel.target;
+       },
+       _reverseDatapoints: function(item){
+         var reversedatapoints = [];
+         for (var i=0; i<item.datapoints.length; i++)
+         {
+           reversedatapoints[i] = [];
+           reversedatapoints[i][0]=this._convertUnixtime(item.datapoints[i][1]);
+           reversedatapoints[i][1]=item.datapoints[i][0];
+
+         }
+
+         return reversedatapoints;
+       },
+       _convertUnixtime:function(dtp){
+          var date = new Date(dtp*1000);
+          // Hours part from the timestamp
+          var hours = date.getHours();
+          // Minutes part from the timestamp
+          var minutes = "0" + date.getMinutes();
+          // Seconds part from the timestamp
+          var seconds = "0" + date.getSeconds();
+
+          // Will display time in 10:30:23 format
+          var formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+          return formattedTime;
+       },
+       _datasourceid: function(datasources,panel){
+         if (panel){
+         for(var i=0; i<datasources.length; i++){
+           if(panel.datasource == datasources[i].name){
+             console.log('OKEY', datasources[i].id);
+             return datasources[i].id;
+           }
+         }
+       }
+       else {
+         console.log("no panel");
+       }
        }
       });
     </script>

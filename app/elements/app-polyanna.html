@@ -22,34 +22,31 @@
            font-weight: bold;
        }
       </style>
-      <h2 id="show">Hello!1!</h2>
-        <br>
-        <!--<div id="panel1">here</div>
-        <div id="panel2">here</div>
-        <br></br>-->
-        <!--<iframe src="http://localhost:3000/dashboard-solo/db/mydashboard?panelId=4&fullscreen&from=1455559611280&to=1456243760954" width="1250" height="900" align="center" frameborder="0"></iframe> -->
-        <!-- <chart-bar>hello</chart-bar> -->
-        <br></br>
+      <h2 id="show" style="display:none;">Hello!1!</h2>
         <template is="dom-repeat" items="[[rows]]">
-          <row-element height="[[rowheight(index)]]" title="[[_fillrow1(index)]]" row="[[thisRow(index)]]"></row-element>
-          <p>{{item.title}}</p>
+          <row-element datasources="[[datasources]]" height="[[rowheight(index)]]" title="[[_fillrow1(index)]]" row="[[thisRow(index)]]"></row-element>
          </template>
         <br></br>
         <!--<chart-bar>hello</chart-bar>-->
         <br></br>
-        <template is="dom-repeat" items="[[rows]]">
-          <row-element height="[[rowheight(item)]]" ></row-element>
-        </template>
       <iron-ajax
       auto
-      url="http://localhost:5000/api/dashboards/home"
+      url="http://localhost:5000/api/dashboards/db/mydashboard"
       headers='{"Authorization": "Bearer eyJrIjoiTDdKaHdKNjJFT05nWU81dHlnYVVkbGdiUmVIY1lYUWkiLCJuIjoibXlrZXkiLCJpZCI6Mn0="}'
       handle-as="json"
       method="GET"
       on-response="_handleResponse"
       debounce-duration="300"
     ></iron-ajax>
-
+    <iron-ajax
+      auto
+      url="http://localhost:5000/api/datasources"
+      headers='{"Authorization": "Bearer eyJrIjoiTDdKaHdKNjJFT05nWU81dHlnYVVkbGdiUmVIY1lYUWkiLCJuIjoibXlrZXkiLCJpZCI6Mn0="}'
+      handle-as="json"
+      method="GET"
+      on-response="_saveDatasources"
+      debounce-duration="50"
+    ></iron-ajax>
     </template>
     <script>
 
@@ -59,7 +56,14 @@
           properties: {
             response: Object,
             rows: {type:Array, value: []},
+            test: {type:String, value: 'test'},
+            datasources: Array,
             // rows:
+          },
+          _saveDatasources:function(data){
+            this.datasources=data.detail.response;
+            console.log(data.detail.response);
+            console.log(this.datasources);
           },
           _handleResponse:function(data){
             this.$.show.textContent = data.detail.response;
@@ -74,7 +78,9 @@
             //alert(1);
           },
           rowheight: function(index){
-            return this.rows[index].height;
+            if(this.rows){
+              return this.rows[index].height;
+            }
           },
           makeRows: function() {
             this.rows = this.response.dashboard.rows;
