@@ -9,10 +9,7 @@
           width: 400px;
           display: block;
         }
-
       </style>
-
-      <div>[[panel.title]]</div>
       <div style="display: none;">[[datasourceid]]</div>
       <template is="dom-if" if="[[isGraph]]">
         <iron-ajax id="ajax"
@@ -23,17 +20,19 @@
         method="GET"
         on-response="_handlePanelRequest"
         debounce-duration="300"></iron-ajax>
-
-        <template is="dom-repeat" items="[[graphs]]" >
-          <google-chart
-            id='line_chart'
-            type='line'
-            options='{"title":""}'
-            cols='[{"label": "Month", "type": "string"},{"label": "Days", "type": "number"}]'
-            rows='[[_reverseDatapoints(item)]]'>
-            //cols='[[getTime()]]'
-          </google-chart>
-          <p>[[item.target]]</p>
+        <template is="dom-repeat" items="[[graphs]]">
+          <paper-card heading="[[panel.title]]">
+            <div class="card-content">
+              <google-chart
+                id='line_chart'
+                type='line'
+                options='{"title":""}'
+                cols='[{"label": "Month", "type": "string"},{"label": "Days", "type": "number"}]'
+                rows='[[_reverseDatapoints(item)]]'>
+              </google-chart>
+              <p>[[item.target]]</p>
+            </div>
+          </paper-card>
         </template>
 
       </template>
