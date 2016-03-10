@@ -9,6 +9,19 @@
           width: 400px;
           display: block;
         }
+        #target{
+          color:#00688B;
+          font-weight: bold;
+          text-align: left;
+        }
+        paper-card{
+          font-family:Georgia, serif;
+          font-weight:bold;width:40%;
+          border: 2px solid black;
+        }
+        paper-button{
+          font-family:Georgia, serif;
+        }
       </style>
       <div style="display: none;">[[datasourceid]]</div>
       <template is="dom-if" if="[[isGraph]]">
@@ -21,7 +34,8 @@
         on-response="_handlePanelRequest"
         debounce-duration="300"></iron-ajax>
         <template is="dom-repeat" items="[[graphs]]">
-          <paper-card heading="[[panel.title]]">
+        <paper-card>
+          <paper-button raised>[[panel.title]]</paper-button>
             <div class="card-content">
               <google-chart
                 id='line_chart'
@@ -30,7 +44,7 @@
                 cols='[{"label": "Month", "type": "string"},{"label": "Days", "type": "number"}]'
                 rows='[[_reverseDatapoints(item)]]'>
               </google-chart>
-              <p>[[item.target]]</p>
+              <ul style="list-style-type:square"><li id="target">[[item.target]]</li></ul>
             </div>
           </paper-card>
         </template>
@@ -56,7 +70,6 @@
           isGraph:{type:Boolean, computed:"_isGraph(panel)"},
           time:{type:Array,computed:"getTime(panel)"}
         },
-
         _handlePanelRequest(data){
           console.log("hi", data.detail.response);
           this.graphs=data.detail.response;
@@ -78,6 +91,9 @@
        },
        getTarget: function(panel){
          return this.panel.target;
+       },
+       _editPanel:function(){
+
        },
        _reverseDatapoints: function(item){
          var reversedatapoints = [];
