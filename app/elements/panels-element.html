@@ -6,24 +6,62 @@
       <style>
         google-chart {
           height: 300px;
-          width: 400px;
+          width: 100%;
           display: block;
         }
         #target{
-          color:#00688B;
+          color:#000000;
           font-weight: bold;
           text-align: left;
         }
         paper-card{
-          font-family:Georgia, serif;
-          font-weight:bold;width:40%;
-          border: 2px solid black;
+          width:49%;
+          margin-bottom: 20px;
+          margin-left: 5px;
+          margin-right: 5px;
+
         }
-        paper-button{
-          font-family:Georgia, serif;
+        #panel_title{
+          position: relative;
+          margin: 8px;
+          height: 90px;
+          border: 1px;
+          text-align: center;
+        }
+        #panel_title h2 {
+          display: inline;
+          background-color:#f1f1f1;
+          padding: 16px;
+          border-radius: 15px;
+          font-size: 24px;
+          font-weight: 400;
         }
       </style>
       <div style="display: none;">[[datasourceid]]</div>
+      <template is="dom-if" if="[[isDashlist]]">
+        <div id="panel_title" elevation="2">
+          <h2>[[panel.title]]</h2>
+        </div>
+        <paper-card elevation="4">
+          mydashboards
+        </paper-card>
+      </template>
+      <template is="dom-if" if="[[isText]]">
+        <div id="panel_title" elevation="2">
+          <h2>[[panel.title]]</h2>
+        </div>
+        <paper-card elevation="4">
+          [[panel.content]]
+        </paper-card>
+      </template>
+      <template is="dom-if" if="[[isSinglestat]]">
+        <div id="panel_title" elevation="2">
+          <h2>[[panel.title]]</h2>
+        </div>
+        <paper-card elevation="4">
+          [[panel.prefix]] [[panel.postfix]] [[panel.valueMaps[0].op]]
+        </paper-card>
+      </template>
       <template is="dom-if" if="[[isGraph]]">
         <iron-ajax id="ajax"
         auto
@@ -33,22 +71,23 @@
         method="GET"
         on-response="_handlePanelRequest"
         debounce-duration="300"></iron-ajax>
-        <template is="dom-repeat" items="[[graphs]]">
-        <paper-card>
-          <paper-button raised>[[panel.title]]</paper-button>
+        <div id="panel_title" elevation="2">
+          <h2>[[panel.title]]<paper-icon-button icon="editor:mode-edit" title="edit"></h2></paper-icon-button>
+        </div>
+        <template is="dom-repeat" items="[[graphs]]" >
+        <paper-card elevation="4">
             <div class="card-content">
+              <ul style="list-style-type:square"><li id="target">[[item.target]]</li></ul>
               <google-chart
                 id='line_chart'
                 type='line'
                 options='{"title":""}'
-                cols='[{"label": "Month", "type": "string"},{"label": "Days", "type": "number"}]'
+                cols='[{"label": "Time", "type": "string"},{"label": "Percentage", "type": "number"}]'
                 rows='[[_reverseDatapoints(item)]]'>
               </google-chart>
-              <ul style="list-style-type:square"><li id="target">[[item.target]]</li></ul>
             </div>
           </paper-card>
         </template>
-
       </template>
 
     </template>
@@ -58,6 +97,7 @@
 
         properties: {
           panel: Object,
+          editable:Object,
           title: String,
           id: Number,
           type: String,
@@ -66,8 +106,12 @@
           graphs:Array,
           datasourceid: {type:String, computed:"_datasourceid(datasources,panel)"},
           targets:{type:Array, computed:"getTarget(panel)"},
-          datapoints:{type:Array, computed: "getDatapoints(panel)"},
+          values:{type:Array, computed:"getValue(panel)"},
+          // datapoints:{type:Array, computed: "getDatapoints(panel)"},
           isGraph:{type:Boolean, computed:"_isGraph(panel)"},
+          isDashlist:{type:Boolean, computed:"_isDashlist(panel)"},
+          isText:{type:Boolean, computed:"_isText(panel)"},
+          isSinglestat:{type:Boolean, computed:"_isSinglestat(panel)"},
           time:{type:Array,computed:"getTime(panel)"}
         },
         _handlePanelRequest(data){
@@ -76,10 +120,36 @@
         },
         _computeUrl: function() {
           console.log('computes url ' +this.datasourceid);
-         return 'http://localhost:5000/api/datasources/proxy/'+this.datasourceid+'/render?format=json&target=ubuntu.cpu-total.cpu.*&from=-300secs';
+        //  return 'http://localhost:5000/api/datasources/proxy/'+this.datasourceid+'/render?format=json&target=ubuntu.cpu-total.cpu.*&from=-300secs';
+        return 'http://localhost:5000/api/datasources/proxy/'+this.datasourceid+'/render?format=json&target='+[[this.panel.targets[0].target]]+'&from=-300secs';
+
        },
        _isGraph: function(panel){
          if (panel.type == "graph") {
+           return true;
+         }
+         else {
+           return false;
+         }
+       },
+       _isDashlist: function(panel){
+         if (panel.type == "dashlist") {
+           return true;
+         }
+         else {
+           return false;
+         }
+       },
+       _isText: function(panel){
+         if (panel.type == "text") {
+           return true;
+         }
+         else {
+           return false;
+         }
+       },
+       _isSinglestat: function(panel){
+         if (panel.type == "singlestat") {
            return true;
          }
          else {
@@ -91,6 +161,9 @@
        },
        getTarget: function(panel){
          return this.panel.target;
+       },
+       getValue:function(panel){
+         return this.panel.valueMaps;
        },
        _editPanel:function(){
 

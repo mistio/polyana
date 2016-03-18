@@ -21,10 +21,14 @@
            float: right;
            font-weight: bold;
        }
+       .row {
+         background-color: red;
+         margin-bottom: 8px;
+       }
       </style>
       <h2 id="show" style="display:none;">Hello!1!</h2>
         <template is="dom-repeat" items="[[rows]]">
-          <row-element datasources="[[datasources]]" height="[[rowheight(index)]]" title="[[_fillrow1(index)]]" row="[[thisRow(index)]]"></row-element>
+          <row-element class="row" datasources="[[datasources]]" height="[[rowheight(index)]]" title="[[_fillrow1(index)]]" row="[[thisRow(index)]]"></row-element>
          </template>
         <br></br>
         <!--<chart-bar>hello</chart-bar>-->
