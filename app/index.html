@@ -75,10 +75,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <!-- Drawer Content -->
         <paper-menu attr-for-selected="data-route" selected="[[route]]">
 
-          <a data-route="app-polyanna" href="{{baseUrl}}app-polyanna">
+          <!-- <a data-route="app-polyanna" href="{{baseUrl}}app-polyanna">
             <iron-icon icon="pets"></iron-icon>
             <span>Polyana</span>
-          </a>
+          </a> -->
+          <dashboards-sidebar>hsjhfjsdhfsdfdjs</dashboards-sidebar>
 
         </paper-menu>
       </paper-scroll-header-panel>
@@ -108,15 +109,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <!-- Main Content -->
         <div class="content">
+          <!-- <dashboard-routing></dashboard-routing> -->
           <iron-pages attr-for-selected="data-route" selected="{{route}}">
-            <!-- <section style="display:none"data-route="home">
+
+            <section data-route="home">
+              <paper-material>
+                <p>Hello. This is home.</p>
+              </paper-material>
+            </section>
+<!-- 
+            <section data-route="dashboard-element">
+                <dashboard-element id='polyanna' dashuri="db/mydashboard"></dashboard-element>
             </section> -->
 
-            <section data-route="app-polyanna">
-                <app-polyanna id='polyanna'></app-polyanna>
+            <section data-route="dashboard-element">
+                <dashboard-element id='polyanna' dashuri="db/new-dashboard"></dashboard-element>
             </section>
 
           </iron-pages>
+
         </div>
       </paper-scroll-header-panel>
     </paper-drawer-panel>

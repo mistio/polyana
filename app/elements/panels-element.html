@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
 <dom-module id="panels-element">
     <template>
@@ -38,12 +39,13 @@
         }
       </style>
       <div style="display: none;">[[datasourceid]]</div>
+
       <template is="dom-if" if="[[isDashlist]]">
         <div id="panel_title" elevation="2">
           <h2>[[panel.title]]</h2>
         </div>
         <paper-card elevation="4">
-          mydashboards
+          mydashboards[[slug]]
         </paper-card>
       </template>
       <template is="dom-if" if="[[isText]]">
@@ -79,8 +81,7 @@
             <div class="card-content">
               <ul style="list-style-type:square"><li id="target">[[item.target]]</li></ul>
               <google-chart
-                id='line_chart'
-                type='line'
+                type="line"
                 options='{"title":""}'
                 cols='[{"label": "Time", "type": "string"},{"label": "Percentage", "type": "number"}]'
                 rows='[[_reverseDatapoints(item)]]'>
@@ -89,7 +90,21 @@
           </paper-card>
         </template>
       </template>
-
+      <template is="dom-if" if="[[isTable]]">
+        <div id="panel_title" elevation="2">
+          <h2>[[panel.title]]</h2>
+        </div>
+        <paper-card elevation="4">
+          <div class="card-content">
+            <google-chart
+              type="line"
+              options='{"title":""}'
+              cols='[{"label": "Time", "type": "string"},{"label": "Percentage", "type": "number"}]'
+              rows='[[_reverseDatapoints(item)]]'>
+            </google-chart>
+          </div>
+        </paper-card>
+      </template>
     </template>
     <script>
       Polymer({
@@ -108,18 +123,22 @@
           targets:{type:Array, computed:"getTarget(panel)"},
           values:{type:Array, computed:"getValue(panel)"},
           // datapoints:{type:Array, computed: "getDatapoints(panel)"},
-          isGraph:{type:Boolean, computed:"_isGraph(panel)"},
-          isDashlist:{type:Boolean, computed:"_isDashlist(panel)"},
-          isText:{type:Boolean, computed:"_isText(panel)"},
-          isSinglestat:{type:Boolean, computed:"_isSinglestat(panel)"},
+          isGraph:{type:Boolean, value: false, computed:"_isGraph(panel)"},
+          isDashlist:{type:Boolean, value: false, computed:"_isDashlist(panel)"},
+          isText:{type:Boolean, value: false, computed:"_isText(panel)"},
+          isSinglestat:{type:Boolean, value: false, computed:"_isSinglestat(panel)"},
+          isTable:{type:Boolean, value: false, computed:"_isTable(panel)"},
           time:{type:Array,computed:"getTime(panel)"}
+        },
+        attached: function(){
+          console.log('PANEL ',this.datasourceid, this.panel.title, this.type);
         },
         _handlePanelRequest(data){
           console.log("hi", data.detail.response);
           this.graphs=data.detail.response;
         },
         _computeUrl: function() {
-          console.log('computes url ' +this.datasourceid);
+
         //  return 'http://localhost:5000/api/datasources/proxy/'+this.datasourceid+'/render?format=json&target=ubuntu.cpu-total.cpu.*&from=-300secs';
         return 'http://localhost:5000/api/datasources/proxy/'+this.datasourceid+'/render?format=json&target='+[[this.panel.targets[0].target]]+'&from=-300secs';
 
@@ -150,6 +169,14 @@
        },
        _isSinglestat: function(panel){
          if (panel.type == "singlestat") {
+           return true;
+         }
+         else {
+           return false;
+         }
+       },
+       _isTable: function(panel){
+         if (panel.type == "table") {
            return true;
          }
          else {
