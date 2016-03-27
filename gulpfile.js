@@ -235,11 +235,13 @@ gulp.task('server:test', function () {
 
 var proxy = require('proxy-middleware');
 var url = require('url');
+var config = require('./config.json');
 
 // Watch files for changes & reload
 gulp.task('serve', ['styles', 'elements'], function() {
-  var proxyOptions = url.parse('http://localhost:3000/api');
+  var proxyOptions = url.parse(config.uri);
   proxyOptions.route = '/api';
+  proxyOptions.headers = {"Authorization": "Bearer " + config.token};
   browserSync({
     port: 5000,
     notify: false,
