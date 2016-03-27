@@ -8,32 +8,20 @@
           text-align: center;
           color: #000000;
         }
-        #panel1{
-          width: 150px;
-          margin-left: 68px;
-          float: left;
-          font-weight: bold;
-        }
-        #panel2{
-          display: block;
-          margin-right: 68px;
-          float: right;
-          font-weight: bold;
-        }
         .row {
           background-color: red;
           margin-bottom: 8px;
         }
       </style>
       <h2 id="show">[[uri]]</h2>
-        <template is="dom-repeat" items="{{dashboard.rows}}">
-          <row-element class="row" datasources="[[datasources]]" height="[[rowheight(index)]]" title="[[_fillrow1(index)]]" row="[[thisRow(index)]]"></row-element>
-        </template>
+      <template is="dom-repeat" items="{{dashboard.rows}}">
+        <dashboard-row class="row" datasources="[[datasources]]" row="[[item]]"></dashboard-row>
+      </template>
       <iron-ajax auto
         url="/api/dashboards/[[uri]]"
         handle-as="json"
         method="GET"
-        on-response="_handleResponse"
+        on-response="_saveDashboards"
         debounce-duration="300"></iron-ajax>
       <!-- url="[[_getUri()]]" -->
       <iron-ajax auto
@@ -66,7 +54,7 @@
             console.log(data.detail.response);
             console.log(this.datasources);
           },
-          _handleResponse:function(data){
+          _saveDashboards:function(data){
             this.set('dashboard', data.detail.response.dashboard);
             this.set('meta', data.detail.response.meta);
             //this.$.show.textContent = data.detail.response;

@@ -68,14 +68,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         url="/api/search"
         handle-as="json"
         method="GET"
+        timeout="2000"
+        last-error="{{apierror}}"
         last-response="{{dashboards}}"
+        loading={{dashboardsLoading}}
         debounce-duration="300"></iron-ajax>
+        <iron-ajax auto
+            url="/api/datasources"
+            handle-as="json"
+            method="GET"
+            timeout="2000"
+            last-error="{{apierror}}"
+            last-response="{{datasources}}"
+            loading={{datasourcesLoading}}
+            debounce-duration="300"></iron-ajax>
     <paper-drawer-panel id="paperDrawerPanel">
       <!-- Drawer Scroll Header Panel -->
       <paper-scroll-header-panel drawer fixed>
         <!-- Drawer Content -->
         <paper-menu attr-for-selected="data-route" selected="[[route]]">
-          <dashboards-sidebar dashboards="[[dashboards]]"></dashboards-sidebar>
+          <polyana-sidebar dashboards="[[dashboards]]"></polyana-sidebar>
         </paper-menu>
       </paper-scroll-header-panel>
 
@@ -98,7 +110,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <iron-pages attr-for-selected="data-route" selected="{{route}}">
             <section data-route="home">
               <paper-material>
-                <p>Hello. This is {{route}}. </p>
+                <template is="dom-if" if="{{dashboardsLoading}}">
+                  <p>Loading Grafana dashboards...</p>
+                </template>
+                <template is="dom-if" if="{{apierror}}">
+                  <p>Error getting data from Grafana. [[apierror.error.type]]</p>
+                </template>
+                <template is="dom-if" if="[[dashboards]]">
+                  <p>Dashboards: [[dashboards.length]] </p>
+                </template>
+                <template is="dom-if" if="[[datasources]]">
+                  <p>Datasources: [[datasources.length]]</p>
+                </template>
               </paper-material>
             </section>
 

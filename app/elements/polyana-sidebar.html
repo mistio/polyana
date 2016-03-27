@@ -1,7 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 
-<dom-module id="dashboards-sidebar">
+<dom-module id="polyana-sidebar">
     <template>
       <style is="custom-style">
         paper-menu {
@@ -51,16 +51,12 @@
     </template>
     <script>
     Polymer({
-      is: 'dashboards-sidebar',
+      is: 'polyana-sidebar',
 
       properties:{
         dashboards: {
           type: Array
         }
-      },
-
-      _dashlistResponse:function(data){
-        this.dashboards = data.detail.response;
       }
     });
     </script>

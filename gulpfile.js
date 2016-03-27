@@ -233,15 +233,43 @@ gulp.task('server:test', function () {
   });
 });
 
-var proxy = require('proxy-middleware');
 var url = require('url');
-var config = require('./config.json');
+
+var proxyMiddleware = require('http-proxy-middleware');
 
 // Watch files for changes & reload
 gulp.task('serve', ['styles', 'elements'], function() {
-  var proxyOptions = url.parse(config.uri);
-  proxyOptions.route = '/api';
-  proxyOptions.headers = {"Authorization": "Bearer " + config.token};
+  // Get Grafana URI and token from config.json file
+  try {
+    var config = require('./config.json');
+  } catch (e) {
+    console.error('ERROR: config.json not found. Exiting');
+    return false;
+  }
+  if (!config.uri) {
+    console.error('uri not set in config.json');
+    return false;
+  }
+  if (!config.token) {
+    console.error('token not set in config.json');
+    return false;
+  }
+
+  // Setup proxying of Grafana API on /api
+  var proxyOptions = {
+      target: config.uri,
+      onProxyReq: function (proxyReq, req, res) {
+          proxyReq.setHeader('Authorization', "Bearer " + config.token);
+      },
+      onProxyRes: function (proxyRes, req, res) {
+          if (proxyRes.statusCode == 401)
+          console.error('Error proxying Grafana API: Unauthorized.');
+      },
+      onError: function (err, req, res) {
+          console.error('Error proxying Grafana API:', err);
+      }
+  }
+  var middleware = proxyMiddleware('/api', proxyOptions);
   browserSync({
     port: 5000,
     notify: false,
@@ -260,7 +288,7 @@ gulp.task('serve', ['styles', 'elements'], function() {
     // https: true,
     server: {
       baseDir: ['.tmp', 'app'],
-      middleware: [proxy(proxyOptions)]
+      middleware: [middleware]
     }
   });
 
