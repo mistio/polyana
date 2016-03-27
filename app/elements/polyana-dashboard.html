@@ -1,0 +1,101 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<dom-module id="polyana-dashboard">
+    <template>
+      <style>
+        :host{
+          text-align: center;
+          color: #000000;
+        }
+        #panel1{
+          width: 150px;
+          margin-left: 68px;
+          float: left;
+          font-weight: bold;
+        }
+        #panel2{
+          display: block;
+          margin-right: 68px;
+          float: right;
+          font-weight: bold;
+        }
+        .row {
+          background-color: red;
+          margin-bottom: 8px;
+        }
+      </style>
+      <h2 id="show">[[uri]]</h2>
+        <template is="dom-repeat" items="{{dashboard.rows}}">
+          <row-element class="row" datasources="[[datasources]]" height="[[rowheight(index)]]" title="[[_fillrow1(index)]]" row="[[thisRow(index)]]"></row-element>
+        </template>
+      <iron-ajax auto
+        url="/api/dashboards/[[uri]]"
+        handle-as="json"
+        method="GET"
+        on-response="_handleResponse"
+        debounce-duration="300"></iron-ajax>
+      <!-- url="[[_getUri()]]" -->
+      <iron-ajax auto
+        url="/api/datasources"
+        handle-as="json"
+        method="GET"
+        on-response="_saveDatasources"
+        debounce-duration="50"></iron-ajax>
+    </template>
+    <script>
+        Polymer({
+          is: 'polyana-dashboard',
+
+          properties: {
+            uri: {
+              type: String
+            },
+            dashboard: {
+              type: Object
+            },
+            meta: {
+              type: Object
+            },
+            datasources: {
+              type: Array
+            }
+          },
+          _saveDatasources:function(data){
+            this.datasources=data.detail.response;
+            console.log(data.detail.response);
+            console.log(this.datasources);
+          },
+          _handleResponse:function(data){
+            this.set('dashboard', data.detail.response.dashboard);
+            this.set('meta', data.detail.response.meta);
+            //this.$.show.textContent = data.detail.response;
+            this.response = data.detail.response;
+            console.log('handle response', this.uri, data);
+          },
+          _fillrow1: function(index){
+            var node = this.response.dashboard.rows[index].panels.title;
+            this.title= node;
+            return  node;
+            //alert(1);
+          },
+          rowheight: function(index){
+            if(this.rows){
+              return this.rows[index].height;
+            }
+          },
+          makeRows: function() {
+            this.rows = this.response.dashboard.rows;
+          },
+          thisRow: function(index){
+            return this.response.dashboard.rows[index]
+          },
+          translateResponse: function() {
+            for (var prop in this.responce) {
+
+            }
+          }
+      });
+
+    </script>
+</dom-module>

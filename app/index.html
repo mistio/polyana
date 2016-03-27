@@ -16,7 +16,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="Polymer Starter Kit">
-  <title>Polymer Starter Kit</title>
+  <title>Polyana</title>
 
   <!-- Place favicon.ico in the `app/` directory -->
 
@@ -37,7 +37,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <!-- Add to homescreen for Safari on iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="Polymer Starter Kit">
+  <meta name="apple-mobile-web-app-title" content="Polyana">
   <link rel="apple-touch-icon" href="images/touch/apple-touch-icon.png">
 
   <!-- Tile icon for Win8 (144x144) -->
@@ -60,27 +60,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 </head>
 
 <body unresolved>
+  <!-- build:remove -->
   <span id="browser-sync-binding"></span>
+  <!-- endbuild -->
   <template is="dom-bind" id="app">
-
+    <iron-ajax auto
+        url="/api/search"
+        handle-as="json"
+        method="GET"
+        last-response="{{dashboards}}"
+        debounce-duration="300"></iron-ajax>
     <paper-drawer-panel id="paperDrawerPanel">
       <!-- Drawer Scroll Header Panel -->
       <paper-scroll-header-panel drawer fixed>
-
-        <!-- Drawer Toolbar -->
-        <paper-toolbar id="drawerToolbar">
-          <span class="menu-name">Menu</span>
-        </paper-toolbar>
-
         <!-- Drawer Content -->
         <paper-menu attr-for-selected="data-route" selected="[[route]]">
-
-          <!-- <a data-route="app-polyanna" href="{{baseUrl}}app-polyanna">
-            <iron-icon icon="pets"></iron-icon>
-            <span>Polyana</span>
-          </a> -->
-          <dashboards-sidebar>hsjhfjsdhfsdfdjs</dashboards-sidebar>
-
+          <dashboards-sidebar dashboards="[[dashboards]]"></dashboards-sidebar>
         </paper-menu>
       </paper-scroll-header-panel>
 
@@ -92,40 +87,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
           <span class="space"></span>
 
-          <!-- Toolbar icons -->
-          <paper-icon-button icon="refresh"></paper-icon-button>
-          <paper-icon-button icon="search"></paper-icon-button>
-
           <!-- Application name -->
           <div class="middle middle-container">
-            <div class="app-name">Polyana</div>
-          </div>
-
-          <!-- Application sub title -->
-          <div class="bottom bottom-container">
-            <div class="bottom-title">The future of the web today</div>
+            <div class="app-name">{{title}}</div>
           </div>
         </paper-toolbar>
 
         <!-- Main Content -->
         <div class="content">
-          <!-- <dashboard-routing></dashboard-routing> -->
           <iron-pages attr-for-selected="data-route" selected="{{route}}">
-
             <section data-route="home">
               <paper-material>
-                <p>Hello. This is home.</p>
+                <p>Hello. This is {{route}}. </p>
               </paper-material>
             </section>
-<!-- 
-            <section data-route="dashboard-element">
-                <dashboard-element id='polyanna' dashuri="db/mydashboard"></dashboard-element>
-            </section> -->
 
-            <section data-route="dashboard-element">
-                <dashboard-element id='polyanna' dashuri="db/new-dashboard"></dashboard-element>
+            <section data-route='dashboard-element'>
+              <paper-material>
+                <template is="dom-if" if="{{uri}}">
+                  <polyana-dashboard uri="{{uri}}"></polyana-dashboard>
+                </template>
+              </paper-material>
             </section>
-
           </iron-pages>
 
         </div>
@@ -135,24 +118,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <paper-toast id="toast">
       <span class="toast-hide-button" role="button" tabindex="0" onclick="app.$.toast.hide()">Ok</span>
     </paper-toast>
-
-    <!-- Uncomment next block to enable Service Worker support (1/2) -->
-    <!--
-    <paper-toast id="caching-complete"
-                 duration="6000"
-                 text="Caching complete! This app will work offline.">
-    </paper-toast>
-
-    <platinum-sw-register auto-register
-                          clients-claim
-                          skip-waiting
-                          base-uri="bower_components/platinum-sw/bootstrap"
-                          on-service-worker-installed="displayInstalledToast">
-      <platinum-sw-cache default-cache-strategy="fastest"
-                         cache-config-file="cache-config.json">
-      </platinum-sw-cache>
-    </platinum-sw-register>
-    -->
 
   </template>
 

@@ -1,7 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-
 <dom-module id="panels-element">
     <template>
       <style>
@@ -68,7 +66,6 @@
         <iron-ajax id="ajax"
         auto
         url="[[_computeUrl()]]"
-        headers='{"Authorization": "Bearer eyJrIjoiTDdKaHdKNjJFT05nWU81dHlnYVVkbGdiUmVIY1lYUWkiLCJuIjoibXlrZXkiLCJpZCI6Mn0="}'
         handle-as="json"
         method="GET"
         on-response="_handlePanelRequest"
@@ -140,7 +137,7 @@
         _computeUrl: function() {
 
         //  return 'http://localhost:5000/api/datasources/proxy/'+this.datasourceid+'/render?format=json&target=ubuntu.cpu-total.cpu.*&from=-300secs';
-        return 'http://localhost:5000/api/datasources/proxy/'+this.datasourceid+'/render?format=json&target='+[[this.panel.targets[0].target]]+'&from=-300secs';
+        return '/api/datasources/proxy/'+this.datasourceid+'/render?format=json&target='+[[this.panel.targets[0].target]]+'&from=-300secs';
 
        },
        _isGraph: function(panel){
