@@ -1,56 +1,39 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 
-<dom-module id="row-element">
+<link rel="import" href="dashboard-panel.html">
+<!--
+  TODO: collapse row, show collapsed, edit row
+-->
+<dom-module id="dashboard-row">
     <template>
       <style>
         :host{
           border-collapse: collapse;
-          /*border: 1px solid black;*/
           width: 100%;
           text-align: center;
-          padding: 15px;
           display: inline-block;
         }
       </style>
       <div>
-        <template is="dom-repeat" items="[[panels]]">
-          <panels-element panel="[[thisPanel(index)]]" datasources="[[datasources]]"></panels-element>
+        <template is="dom-if" if="[[row.showTitle]]">
+          <h2 id="show">[[row.title]]</h2>
+        </template>
+        <template is="dom-repeat" items="[[row.panels]]">
+          <dashboard-panel panel="[[item]]" datasources="[[datasources]]" from="[[from]]" id="panel-[[item.id]]"></dashboard-panel>
         </template>
       </div>
     </template>
     <script>
       Polymer({
-        is: 'row-element',
+        is: 'dashboard-row',
 
         properties: {
-          title:String,
-          height: String,
-          computedHeight: {type:String, computed:'rowheight(height)'},
+          title: String,
+          from: String,
           datasources: Array,
-          showTitle: {type:String, computed:'_fillrow1(title)'},
-          row:{type:Object},
-          panels:{type:Array, computed:'getPanels(row)'}
-        },
-        _getDatasourceId:function(index){
-          var name = this.row.panels[index].datasource;
-          return '2';
-        },
-        rowheight:function(height){
-          if(height){
-            return "height:"+this.height;
-          }
-        },
-        _fillrow1:function(){
-          return "title"+this.title;
-        },
-        thisPanel:function(index){
-          return this.row.panels[index];
-        },
-        getPanels:function(row){
-           return row.panels;
-        },
-
+          row: Object
+        }
       });
     </script>
 </dom-module>

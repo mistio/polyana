@@ -1,35 +1,22 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
-
+<link rel="import" href="dashboard-row.html">
 <dom-module id="polyana-dashboard">
     <template>
       <style>
         :host{
           text-align: center;
-          color: #000000;
-        }
-        .row {
-          background-color: red;
-          margin-bottom: 8px;
         }
       </style>
-      <h2 id="show">[[uri]]</h2>
-      <template is="dom-repeat" items="{{dashboard.rows}}">
-        <dashboard-row class="row" datasources="[[datasources]]" row="[[item]]"></dashboard-row>
+      <template is="dom-repeat" items="{{response.dashboard.rows}}">
+        <dashboard-row class="row" datasources="[[datasources]]" row="[[item]]" style="height: [[item.height]]" from="[[response.dashboard.time.from]]" id="row-{{index}}"></dashboard-row>
       </template>
       <iron-ajax auto
         url="/api/dashboards/[[uri]]"
         handle-as="json"
         method="GET"
-        on-response="_saveDashboards"
+        last-response="{{response}}"
         debounce-duration="300"></iron-ajax>
-      <!-- url="[[_getUri()]]" -->
-      <iron-ajax auto
-        url="/api/datasources"
-        handle-as="json"
-        method="GET"
-        on-response="_saveDatasources"
-        debounce-duration="50"></iron-ajax>
     </template>
     <script>
         Polymer({
@@ -39,49 +26,38 @@
             uri: {
               type: String
             },
-            dashboard: {
-              type: Object
-            },
-            meta: {
+            response: {
               type: Object
             },
             datasources: {
               type: Array
+            },
+            targets: {
+              type: Array,
+              computed: "_getTargets(response, datasources)"
+            },
+            datapoints: {
+              type: Object
+            },
+            from: {
+              type: String
             }
           },
-          _saveDatasources:function(data){
-            this.datasources=data.detail.response;
-            console.log(data.detail.response);
-            console.log(this.datasources);
-          },
-          _saveDashboards:function(data){
-            this.set('dashboard', data.detail.response.dashboard);
-            this.set('meta', data.detail.response.meta);
-            //this.$.show.textContent = data.detail.response;
-            this.response = data.detail.response;
-            console.log('handle response', this.uri, data);
-          },
-          _fillrow1: function(index){
-            var node = this.response.dashboard.rows[index].panels.title;
-            this.title= node;
-            return  node;
-            //alert(1);
-          },
-          rowheight: function(index){
-            if(this.rows){
-              return this.rows[index].height;
-            }
-          },
-          makeRows: function() {
-            this.rows = this.response.dashboard.rows;
-          },
-          thisRow: function(index){
-            return this.response.dashboard.rows[index]
-          },
-          translateResponse: function() {
-            for (var prop in this.responce) {
 
-            }
+          _getTargets: function (response, datasources) {
+              var targets = {};
+              for (var i=0; i<response.dashboard.rows.length; i++) {
+                if (response.dashboard.rows[i].panels)
+                  for (var j=0; j<response.dashboard.rows[i].panels.length; j++)
+                    if (response.dashboard.rows[i].panels[j] && response.dashboard.rows[i].panels[j].targets)
+                      for (var k=0; k<response.dashboard.rows[i].panels[j].targets.length; k++) {
+                          if (response.dashboard.rows[i].panels[j].datasource && targets[response.dashboard.rows[i].panels[j].datasource] == undefined)
+                            targets[response.dashboard.rows[i].panels[j].datasource] = [];
+                          if (response.dashboard.rows[i].panels[j].targets[k].target && targets[response.dashboard.rows[i].panels[j].datasource].indexOf(response.dashboard.rows[i].panels[j].targets[k].target)==-1)
+                            targets[response.dashboard.rows[i].panels[j].datasource].push(response.dashboard.rows[i].panels[j].targets[k].target)
+                      }
+              }
+              return targets
           }
       });
 

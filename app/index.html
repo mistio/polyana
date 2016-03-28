@@ -63,7 +63,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <!-- build:remove -->
   <span id="browser-sync-binding"></span>
   <!-- endbuild -->
+
   <template is="dom-bind" id="app">
+
     <iron-ajax auto
         url="/api/search"
         handle-as="json"
@@ -73,21 +75,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         last-response="{{dashboards}}"
         loading={{dashboardsLoading}}
         debounce-duration="300"></iron-ajax>
-        <iron-ajax auto
-            url="/api/datasources"
-            handle-as="json"
-            method="GET"
-            timeout="2000"
-            last-error="{{apierror}}"
-            last-response="{{datasources}}"
-            loading={{datasourcesLoading}}
-            debounce-duration="300"></iron-ajax>
+
+    <iron-ajax auto
+        url="/api/datasources"
+        handle-as="json"
+        method="GET"
+        timeout="2000"
+        last-error="{{apierror}}"
+        last-response="{{datasources}}"
+        loading={{datasourcesLoading}}
+        debounce-duration="300"></iron-ajax>
+
     <paper-drawer-panel id="paperDrawerPanel">
       <!-- Drawer Scroll Header Panel -->
       <paper-scroll-header-panel drawer fixed>
         <!-- Drawer Content -->
         <paper-menu attr-for-selected="data-route" selected="[[route]]">
-          <polyana-sidebar dashboards="[[dashboards]]"></polyana-sidebar>
+          <polyana-sidebar dashboards="[[dashboards]]" datasources="[[datasources]]"></polyana-sidebar>
         </paper-menu>
       </paper-scroll-header-panel>
 
@@ -126,9 +130,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </section>
 
             <section data-route='dashboard-element'>
-              <paper-material>
+              <paper-material elevation="0">
                 <template is="dom-if" if="{{uri}}">
-                  <polyana-dashboard uri="{{uri}}"></polyana-dashboard>
+                  <polyana-dashboard uri="[[uri]]" datasources="[[datasources]]"></polyana-dashboard>
                 </template>
               </paper-material>
             </section>
