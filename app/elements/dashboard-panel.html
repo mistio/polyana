@@ -1,6 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/c3-chart/c3-chart.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+
 <dom-module id="dashboard-panel">
   <template>
     <style>
@@ -8,43 +10,43 @@
         font-weight: bold;
         text-align: left;
       }
-      paper-card h2 {
-        position: relative;
+      paper-card {
+        width: 100%;
+        padding: 16px;
+        margin: 16px;
       }
     </style>
-    <template is="dom-if" if="[[_isDashlist(panel)]]">
-      <paper-card>
-        <h2>[[panel.title]]</h2>
-        <div><!-- TODO -->...</div>
-      </paper-card>
-    </template>
-    <template is="dom-if" if="[[_isText(panel)]]">
-      <div id="panel-title">
-      </div>
-      <paper-card>
-        <h2>[[panel.title]]</h2>
+    <paper-card>
+      <h3>[[panel.title]]</h3>
+
+      <template is="dom-if" if="[[_isText(panel)]]">
         <div>[[panel.content]]</div>
-      </paper-card>
-    </template>
-    <template is="dom-if" if="[[_isSinglestat(panel)]]">
-      <paper-card>
-        <h2>[[panel.title]]</h2>
-        [[panel.prefix]] [[panel.postfix]] [[panel.valueMaps[0].op]]
-      </paper-card>
-    </template>
-    <template is="dom-if" if="[[_isGraph(panel)]]">
-      <h2>[[panel.title]]</h2>
-      <c3-chart></c3-chart>
-      <iron-ajax auto
-        url="[[_computeUrl()]]"
-        handle-as="json"
-        method="GET"
-        on-response="_handlePanelResponse"
-        debounce-duration="300"></iron-ajax>
-    </template>
-    <template is="dom-if" if="[[_isTable(panel)]]">
-      <!-- TODO -->
-    </template>
+      </template>
+
+      <template is="dom-if" if="[[_isSinglestat(panel)]]">
+        <div>[[panel.prefix]] [[panel.postfix]] [[panel.valueMaps.0.op]]</div>
+      </template>
+
+      <template is="dom-if" if="[[_isGraph(panel)]]">
+        <paper-spinner active="[[loading]]"></paper-spinner>
+        <iron-ajax auto
+          url="{{_computeUrl(datasourceUri)}}"
+          handle-as="json"
+          method="GET"
+          loading="{{loading}}"
+          on-response="_handlePanelResponse"
+          debounce-duration="300"></iron-ajax>
+        <div id="chart"></div>
+      </template>
+
+      <template is="dom-if" if="[[_isDashlist(panel)]]">
+        <div><!-- TODO -->...</div>
+      </template>
+
+      <template is="dom-if" if="[[_isTable(panel)]]">
+        <div><!-- TODO -->...</div>
+      </template>
+    </paper-card>
   </template>
   <script>
     Polymer({
@@ -54,11 +56,11 @@
         from: String,
         panel: Object,
         type: String,
-        datasources: {
-          type: Array,
-          value: []
+        loading: Boolean,
+        datasourceUri: {
+          type: String,
+          reflectToAttribute: true
         },
-        graphs:Array,
         chartData: {
           type: Object,
           value: {
@@ -94,8 +96,6 @@
       },
 
       _handlePanelResponse(data){
-        console.log("hi", data.detail.response);
-        this.set('graphs', data.detail.response);
         var x = [], d = [], xs = {}, xcolumns = [], dcolumns = [];
         for (var i = 0; i < data.detail.response.length; i++) {
           x.push(data.detail.response[i].datapoints.map(function(point){
@@ -110,15 +110,19 @@
         }
         var columns = xcolumns.concat(dcolumns);
         this.set('chartData', {xs: xs, columns: columns});
-        this.querySelector('c3-chart').load(this.chartData);
+
+        var chartEl = document.createElement("c3-chart");
+        chartEl.axis = this.chartAxis;
+        this.querySelector('paper-card div#chart').appendChild(chartEl);
+        chartEl.load(this.chartData);
       },
 
-      _computeUrl: function() {
+      _computeUrl: function(datasourceUri) {
         var targetParams = '';
         for (var i = 0; i < this.panel.targets.length; i++)
           if (this.panel.targets[i].target)
             targetParams += '&target=' + this.panel.targets[i].target
-        return '/api/datasources/proxy/' + this._datasourceId(this.datasources, this.panel) + '/render?format=json' + targetParams + '&from=' + this.from;
+        return datasourceUri + '/render?format=json' + targetParams + '&from=' + this.from.replace('m','min');
       },
 
       _isGraph: function(panel){
@@ -141,23 +145,6 @@
         return panel.type == "table"
       },
 
-      getTarget: function(panel){
-        return this.panel.target;
-      },
-
-      _reverseDatapoints: function(item){
-        var reversedatapoints = [];
-        for (var i=0; i<item.datapoints.length; i++)
-        {
-         reversedatapoints[i] = [];
-         reversedatapoints[i][0]=this._convertUnixtime(item.datapoints[i][1]);
-         reversedatapoints[i][1]=item.datapoints[i][0];
-
-        }
-
-        return reversedatapoints;
-      },
-
       _convertUnixtime:function(dtp) {
         var date = new Date(dtp*1000);
         // Hours part from the timestamp
@@ -170,16 +157,6 @@
         // Will display time in 10:30:23 format
         var formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
         return formattedTime;
-      },
-
-      _datasourceId: function(datasources, panel) {
-        if (panel) {
-          for(var i=0; i<datasources.length; i++) {
-            if(panel.datasource == datasources[i].name) {
-              return datasources[i].id;
-            }
-          }
-        }
       }
     });
   </script>

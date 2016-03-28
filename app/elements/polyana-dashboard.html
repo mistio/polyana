@@ -8,14 +8,14 @@
           text-align: center;
         }
       </style>
-      <template is="dom-repeat" items="{{response.dashboard.rows}}">
-        <dashboard-row class="row" datasources="[[datasources]]" row="[[item]]" style="height: [[item.height]]" from="[[response.dashboard.time.from]]" id="row-{{index}}"></dashboard-row>
+      <template is="dom-repeat" items="{{dashboard.rows}}">
+        <dashboard-row class="row" datasources="[[datasources]]" row="[[item]]" style="height: [[item.height]]; clear: both; display: block" from="[[dashboard.time.from]]" id="row-{{index}}"></dashboard-row>
       </template>
-      <iron-ajax auto
+      <iron-ajax auto="[[uri]]"
         url="/api/dashboards/[[uri]]"
         handle-as="json"
         method="GET"
-        last-response="{{response}}"
+        on-response="_handleResponse"
         debounce-duration="300"></iron-ajax>
     </template>
     <script>
@@ -26,15 +26,18 @@
             uri: {
               type: String
             },
-            response: {
+            dashboard: {
               type: Object
             },
             datasources: {
               type: Array
             },
+            meta: {
+              type: Object
+            },
             targets: {
               type: Array,
-              computed: "_getTargets(response, datasources)"
+              computed: "_getTargets(dashboard, datasources)"
             },
             datapoints: {
               type: Object
@@ -44,17 +47,22 @@
             }
           },
 
-          _getTargets: function (response, datasources) {
+          _handleResponse: function (data) {
+              this.meta = data.detail.response.meta;
+              this.dashboard = data.detail.response.dashboard;
+          },
+
+          _getTargets: function (dashboard, datasources) {
               var targets = {};
-              for (var i=0; i<response.dashboard.rows.length; i++) {
-                if (response.dashboard.rows[i].panels)
-                  for (var j=0; j<response.dashboard.rows[i].panels.length; j++)
-                    if (response.dashboard.rows[i].panels[j] && response.dashboard.rows[i].panels[j].targets)
-                      for (var k=0; k<response.dashboard.rows[i].panels[j].targets.length; k++) {
-                          if (response.dashboard.rows[i].panels[j].datasource && targets[response.dashboard.rows[i].panels[j].datasource] == undefined)
-                            targets[response.dashboard.rows[i].panels[j].datasource] = [];
-                          if (response.dashboard.rows[i].panels[j].targets[k].target && targets[response.dashboard.rows[i].panels[j].datasource].indexOf(response.dashboard.rows[i].panels[j].targets[k].target)==-1)
-                            targets[response.dashboard.rows[i].panels[j].datasource].push(response.dashboard.rows[i].panels[j].targets[k].target)
+              for (var i=0; i<dashboard.rows.length; i++) {
+                if (dashboard.rows[i].panels)
+                  for (var j=0; j<dashboard.rows[i].panels.length; j++)
+                    if (dashboard.rows[i].panels[j] && dashboard.rows[i].panels[j].targets)
+                      for (var k=0; k < dashboard.rows[i].panels[j].targets.length; k++) {
+                          if (dashboard.rows[i].panels[j].datasource && targets[dashboard.rows[i].panels[j].datasource] == undefined)
+                            targets[dashboard.rows[i].panels[j].datasource] = [];
+                          if (dashboard.rows[i].panels[j].targets[k].target && targets[dashboard.rows[i].panels[j].datasource].indexOf(dashboard.rows[i].panels[j].targets[k].target)==-1)
+                            targets[dashboard.rows[i].panels[j].datasource].push(dashboard.rows[i].panels[j].targets[k].target)
                       }
               }
               return targets

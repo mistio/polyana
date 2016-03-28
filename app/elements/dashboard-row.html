@@ -20,7 +20,7 @@
           <h2 id="show">[[row.title]]</h2>
         </template>
         <template is="dom-repeat" items="[[row.panels]]">
-          <dashboard-panel panel="[[item]]" datasources="[[datasources]]" from="[[from]]" id="panel-[[item.id]]"></dashboard-panel>
+          <dashboard-panel datasource-uri="{{_datasourceUri(datasources, item)}}" panel="[[item]]" from="[[from]]" id="panel-[[item.id]]" style="width: [[_elementWidth(item.span)]]; display: block; float: left"></dashboard-panel>
         </template>
       </div>
     </template>
@@ -33,6 +33,22 @@
           from: String,
           datasources: Array,
           row: Object
+        },
+
+        _elementWidth: function (span) {
+          return 100*span/12 + '%';
+        },
+
+        _datasourceUri: function(datasources, panel) {
+          var prefix = '/api/datasources/proxy/';
+          if (panel) {
+            for(var i=0; i<datasources.length; i++) {
+              if(panel.datasource == datasources[i].name) {
+                return prefix + datasources[i].id;
+              }
+            }
+          }
+          return prefix;
         }
       });
     </script>
