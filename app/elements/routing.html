@@ -50,19 +50,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       console.warn(data.params, app.dashboards);
       app.route = 'dashboard-element'; //dahboard-element
       app.params = data.params;
-      if (app.dashboards)
+      if (app.dashboards){
         for (var i=0;i<app.dashboards.length;i++)
           if (app.dashboards[i].id == data.params.id) {
             app.uri = app.dashboards[i].uri;
             app.title = app.dashboards[i].title;
           }
+      }
       if (app.dashboards == undefined) {
         console.warn('defer');
         setTimeout(page, 100, '/dashboard/' + data.params.id);
       }
     });
-
-
 
     // 404
     page('*', function() {

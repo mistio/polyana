@@ -44,7 +44,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png">
 
   <!-- build:css styles/main.css -->
-  <link rel="stylesheet" href="styles/main.css">
+  <!-- <link rel="stylesheet" href="styles/main.css"> -->
   <!-- endbuild-->
 
   <!-- build:js bower_components/webcomponentsjs/webcomponents-lite.min.js -->
@@ -56,7 +56,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <link rel="import" href="elements/elements.html">
 
   <!-- For shared styles, shared-styles.html import in elements.html -->
-  <style is="custom-style" include="shared-styles"></style>
+  <!--<style is="custom-style" include="shared-styles"></style>-->
 </head>
 
 <body unresolved>
@@ -130,11 +130,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </section>
 
             <section data-route='dashboard-element'>
-              <paper-material elevation="0">
+              <!-- <paper-material elevation="0"> -->
                 <template is="dom-if" if="{{uri}}">
                   <polyana-dashboard uri="[[uri]]" datasources="[[datasources]]"></polyana-dashboard>
                 </template>
-              </paper-material>
+              <!-- </paper-material> -->
             </section>
           </iron-pages>
 
