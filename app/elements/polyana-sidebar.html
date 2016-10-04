@@ -4,16 +4,6 @@
 <dom-module id="polyana-sidebar">
     <template>
       <style is="custom-style">
-        paper-menu {
-          --paper-menu-selected-item: {
-            color: #ffffff;
-          }
-
-          --paper-menu-focused-item-after: {
-            background: var(--primary-color);
-          }
-        }
-
         paper-menu iron-icon {
           margin-right: 33px;
           opacity: 0.54;
@@ -23,9 +13,7 @@
         paper-menu a {
           @apply(--layout-horizontal);
           @apply(--layout-center);
-
           text-decoration: none;
-          color: var(--menu-link-color);
           font-family: 'Roboto', 'Noto', sans-serif;
           -webkit-font-smoothing: antialiased;
           text-rendering: optimizeLegibility;
@@ -38,12 +26,10 @@
       </style>
       <paper-menu attr-for-selected="data-route" selected="[[route]]">
         <a data-route="home" href="/">
-          <iron-icon icon="pets"></iron-icon>
           <span>Home</span>
         </a>
         <template is="dom-repeat" items="[[dashboards]]">
           <a data-route="dashboard-element/:[[item.uri]]" href="/dashboard/[[item.id]]">
-            <iron-icon icon="pets"></iron-icon>
             <span>[[item.title]]</span>
           </a>
         </template>
@@ -59,5 +45,6 @@
         }
       }
     });
+
     </script>
 </dom-module>
